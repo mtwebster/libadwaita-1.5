@@ -189,13 +189,12 @@ enable_animations_cb (AdwStyleManager *self)
 static char*
 generate_accent_css (AdwStyleManager *self)
 {
-  AdwAccentColor accent = adw_style_manager_get_accent_color (self);
+  GdkRGBA accent_color = adw_settings_get_accent_color (self->settings);
+
   GString *str = g_string_new ("");
-  GdkRGBA rgba;
   char *rgba_str;
 
-  adw_accent_color_to_rgba (accent, &rgba);
-  rgba_str = gdk_rgba_to_string (&rgba);
+  rgba_str = gdk_rgba_to_string (&accent_color);
 
   g_string_append_printf (str, "@define-color accent_bg_color %s;\n", rgba_str);
   g_string_append (str, "@define-color accent_fg_color white;\n");
@@ -1281,7 +1280,9 @@ adw_style_manager_get_accent_color (AdwStyleManager *self)
 {
   g_return_val_if_fail (ADW_IS_STYLE_MANAGER (self), ADW_ACCENT_COLOR_BLUE);
 
-  return adw_settings_get_accent_color (self->settings);
+  GdkRGBA rgba;
+  rgba = adw_settings_get_accent_color (self->settings);
+  return adw_accent_color_nearest_from_rgba (&rgba);
 }
 
 /**
@@ -1302,16 +1303,10 @@ adw_style_manager_get_accent_color (AdwStyleManager *self)
 GdkRGBA *
 adw_style_manager_get_accent_color_rgba (AdwStyleManager *self)
 {
-  AdwAccentColor color;
-  GdkRGBA rgba;
-
   g_return_val_if_fail (ADW_IS_STYLE_MANAGER (self), NULL);
 
-  color = adw_style_manager_get_accent_color (self);
-
-  adw_accent_color_to_rgba (color, &rgba);
-
-  return gdk_rgba_copy (&rgba);
+  GdkRGBA accent_color = adw_settings_get_accent_color (self->settings);
+  return gdk_rgba_copy (&accent_color);
 }
 
 /**
